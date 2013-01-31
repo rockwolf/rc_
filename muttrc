@@ -1,0 +1,130 @@
+# Some minimal Mutt settings, Gentoo-style.  These reflect the Gentoo
+# predilection for maildir folders.
+#
+# Please don't add settings to this file to change other user
+# preferences (such as colors), since those can be hard for a user to
+# undo if their preference doesn't match yours!  For example, it is
+# *impossible* currently in mutt to remove color settings from objects
+# other than the index.
+
+# default profile
+source ~/doc/mail/profile.default
+# macros to invoke a profile
+source ~/doc/mail/mutt.macros
+macro   index   <F10>    ":source ~/mail/profile.default\n" "Load default profile"
+macro   index   <F11>    ":source ~/mail/profile.bussiness\n" "Load bussiness profile"
+#run fetchmail by hitting key of G
+#macro index G "!fetchmail -v -a -m 'procmail .procmailrc -d %T'\r"
+macro index G "!fetchmail -v -a" #-m 'procmail ~/.procmailrc'\r"
+#macro pager G "!fetchmail -v -a -m 'procmail -d %T'\r"
+macro pager G "!fetchmail -v -a" #-m 'procmail ~/.procmailrc'\r"
+
+#imap
+set imap_user="mymailaddress@gmail.com"
+set imap_pass="mypass"
+set smtp_url="smtp://mymailaddress@smtp.gmail.com:587/"
+set smtp_pass="mypass"
+set sendmail="/usr/bin/esmtp"
+set folder="imaps://imap.gmail.com:993"
+#set spoolfile="=[Gmail]/Inbox"
+#set spoolfile="=[Gmail]/受信トライ"
+#set postponed="=[Gmail]/下書き"
+#set record="=[Gmail]/送信済みメール"
+#set trash="=[Gmail]/ゴミ箱"
+set spoolfile="=[Gmail]/Safata d'entrada"
+set postponed="=[Gmail]/Esborranys"
+set record="=[Gmail]/Enviats"
+set trash="=[Gmail]/Paperera"
+
+set certificate_file=/home/myuser/doc/mail/certs/mymailfolder/ca.pem
+
+set editor=/usr/bin/vi
+set delete=yes                          #delete without prompting
+set include=yes                         #quote msg in reply
+set fast_reply=yes                      #no prompting on reply
+set beep=no                             #no noise
+set markers=no                          #no + on wrapped lines
+set confirmappend=no                    #no prompt for save to =keep
+set to_chars=" +TCF"                    #no L for mail_list
+set sort=threads                        #sort by message threads in index
+set sort_aux=last-date-received                      #sort by message threads in index
+set mbox_type=Maildir
+set move=no
+set dsn_notify="failure,delay,success"
+
+set pager_context=1
+set pager_index_lines=6                 #show a mini-index in pager
+set menu_scroll
+set pgp_verify_sig=no                   #dont show pgp in pager
+set status_on_top                       #put status line at top
+
+# Pretty Good Privacy (PGP):
+set pgp_sign_as="0x5475F368"    # UserID/KeyID for signing
+set nopgp_autoencrypt           # Default (no enc)
+set nopgp_autosign              # Default (sign)
+unset pgp_autoencrypt 		#ask if we want to encrypt
+
+#set status_format=" %r %b %f %n      Del %d      Msgs %m %l %> (%P)"
+#set pager_format="%-10.10i %[!%a %b %d %R]"
+#set date_format="!%H:%M %a %d %b     "
+#set index_format="%4C %Z %[%b%d] %-15.15F %s"
+#set folder_format="%2C %t %8s %d %N %f"
+
+#mailboxes =notify
+mailboxes =inbox
+#mailboxes =archived
+#mailboxes =spam
+#mailboxes =sent`date +%Y-%m`        #sent mail is saved here
+#mailboxes =sent        #sent mail is saved here
+#save-hook .* =inbox                      #default mbox to (s)ave mail is =keep
+# Maybe we shouldn't set index_format here, but this is a recommended
+# one for maildir-style folders.
+set index_format="%4C %Z %{%b %d} %-16.16L  %s"
+
+#colors
+#source ~/.mutt-colors-solarized-dark-256.muttrc
+source ~/.config/mutt/mutt-colors-solarized-dark-16.muttrc
+
+#works with .mailcap in the home folder, to read html messages (uses LYNX browser)
+auto_view text/html
+set print_command="muttprint"
+
+
+#encryption part with gpg
+set pgp_decode_command="gpg %?p?--passphrase-fd 0? --no-verbose --batch --output - %f"
+set pgp_verify_command="gpg --no-verbose --batch --output - --verify %s %f"
+set pgp_verify_sig=yes
+set pgp_decrypt_command="gpg --passphrase-fd 0 --no-verbose --batch --output - %f"
+set pgp_sign_command="gpg --no-verbose --batch --output - --passphrase-fd 0 --armor --detach-sign --textmode %?a?-u %a? %f"
+set pgp_clearsign_command="gpg --no-verbose --batch --output - --passphrase-fd 0 --armor --textmode --clearsign %?a?-u %a? %f"
+set pgp_encrypt_only_command="pgpewrap gpg --batch --quiet --no-verbose --output - --encrypt --textmode --armor --always-trust --encrypt-to 0x5475F368 -- -r %r -- %f"
+set pgp_encrypt_sign_command="pgpewrap gpg --passphrase-fd 0 --batch --quiet --no-verbose --textmode --output - --encrypt --sign %?a?-u %a? --armor --always-trust --encrypt-to 0x5475F368 -- -r %r -- %f"
+set pgp_import_command="gpg --no-verbose --import -v %f"
+set pgp_export_command="gpg --no-verbose --export --armor %r"
+set pgp_verify_key_command="gpg --no-verbose --batch --fingerprint --check-sigs %r"
+set pgp_list_pubring_command="gpg --no-verbose --batch --with-colons --list-keys %r" 
+set pgp_list_secring_command="gpg --no-verbose --batch --with-colons --list-secret-keys %r" 
+set pgp_autosign=yes
+set pgp_sign_as=0x5475F368
+set pgp_replyencrypt=yes
+set pgp_timeout=1800
+set pgp_good_sign="^gpg: This is a validly signed message from"
+# end of encryption part
+#
+#set query_command = "~/files/scripts/mutt-ldap.pl '%s'"
+set query_command = "abook --mutt-query '%s'"
+
+# keybindings
+macro index 8 decrypt-copy
+macro pager 8 decrypt-copy
+
+macro index 9 decrypt-save
+macro pager 9 decrypt-save
+
+macro index \cb   "|urlview\n"
+macro pager \cb   "|urlview\n"
+macro index a     "|abook --add-email\n" 'add sender to abook'
+macro pager a     "|abook --add-email\n" 'add sender to abook'
+
+macro pager \Ca "<enter-command>unset trash\n<delete-message>"
+#macro pager d "<enter-command>set trash=\"+[Gmail]/Trash\"\n<delete-message>"
